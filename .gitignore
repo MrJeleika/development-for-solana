@@ -1,0 +1,12 @@
+node_modules
+.env
+
+# Anchor / Solana build artifacts
+.anchor
+target
+test-ledger
+**/*.rs.bk
+
+# TypeScript
+*.tsbuildinfo
+.DS_Store

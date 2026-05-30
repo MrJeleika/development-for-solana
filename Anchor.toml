@@ -1,0 +1,24 @@
+[toolchain]
+anchor_version = "0.31.1"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+token = "GhAdtT9Vd5Gst89DyG8jShfgygJUdNcoQGGS5fGyZUVT"
+price_voting = "BG1zKVBhFmEi3CTGFf2NhEd9QwTH6N7g6Qtv9Ldidncf"
+price_voting_withdrawal = "5oVN5zywZG6XTUSrgD3qLkpUynYzPNh1MJyqGYK6drm9"
+amm_pair = "A1g16Bjuq9zNiekkSp3JF9X6q9JdJDzhqwz1HQ8tF3kP"
+merkle_airdrop = "B2RUWYg2zsmtu63qNxznF9DZkQ8Gbfymq22jXSpc4Lpf"
+raffle = "Ha5343T7Ld9Toc6vT9msr7Bu5D9DRFRP5JN8Hy7qm7sn"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.test.ts"

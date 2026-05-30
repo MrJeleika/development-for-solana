@@ -1,0 +1,37 @@
+{
+  "name": "solana-template",
+  "version": "1.0.0",
+  "description": "Anchor + Rust Solana program template with bankrun tests",
+  "license": "ISC",
+  "scripts": {
+    "build": "anchor build",
+    "test": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.test.ts",
+    "test:token": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/01-token.test.ts",
+    "test:priceVoting": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/02-price-voting.test.ts",
+    "test:priceVotingWithdrawal": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/03-price-voting-withdrawal.test.ts",
+    "test:ammPair": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/04-amm-pair.test.ts",
+    "test:merkleAirdrop": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/05-merkle-airdrop.test.ts",
+    "test:raffle": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/06-raffle.test.ts",
+    "deploy": "anchor deploy",
+    "prettier": "prettier --write .",
+    "lint": "cargo fmt --all -- --check && cargo clippy --all-targets -- -D warnings",
+    "lint:fix": "cargo fmt --all"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/spl-token": "0.4.14",
+    "@solana/web3.js": "1.98.4",
+    "solana-bankrun": "^0.4.0"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.6",
+    "@types/chai": "^4.3.20",
+    "@types/mocha": "^10.0.10",
+    "chai": "^4.5.0",
+    "merkletreejs": "^0.4.0",
+    "mocha": "^10.8.2",
+    "prettier": "^3.5.3",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^5.7.2"
+  }
+}

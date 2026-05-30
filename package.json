@@ -6,7 +6,7 @@
   "scripts": {
     "build": "anchor build",
     "test": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.test.ts",
-    "test:token": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/01-token.test.ts",
+    "test:donorVault": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/01-donor-vault.test.ts",
     "test:priceVoting": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/02-price-voting.test.ts",
     "test:priceVotingWithdrawal": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/03-price-voting-withdrawal.test.ts",
     "test:ammPair": "anchor build && ts-mocha -p ./tsconfig.json -t 1000000 tests/04-amm-pair.test.ts",

@@ -30,13 +30,13 @@ node --version     # v18+
 ├── package.json
 ├── tsconfig.json
 ├── programs/                # one Anchor program per task
-│   ├── 01-token/            # ← implemented reference example
+│   ├── 01-donor-vault/      # ← implemented reference example
 │   │   ├── src/lib.rs
 │   │   └── TASK.md          # brief — read this first
 │   ├── 02-price-voting/     # stub
 │   └── ...
 ├── tests/                   # one bankrun suite per task
-│   └── 01-token.test.ts
+│   └── 01-donor-vault.test.ts
 └── migrations/deploy.ts
 ```
 
@@ -48,22 +48,23 @@ IDLs + TypeScript types under `target/`.
 
 | #   | Task                                                | Program crate             | Status      |
 | --- | --------------------------------------------------- | ------------------------- | ----------- |
-| 01  | [`01-token`](programs/01-token/)                    | `token`                   | implemented |
+| 01  | [`01-donor-vault`](programs/01-donor-vault/)        | `donor_vault`             | implemented |
 | 02  | [`02-price-voting`](programs/02-price-voting/)      | `price_voting`            | stub        |
 | 03  | [`03-price-voting-withdrawal`](programs/03-price-voting-withdrawal/) | `price_voting_withdrawal` | stub |
 | 04  | [`04-amm-pair`](programs/04-amm-pair/)              | `amm_pair`                | stub        |
 | 05  | [`05-merkle-airdrop`](programs/05-merkle-airdrop/)  | `merkle_airdrop`          | stub        |
 | 06  | [`06-raffle`](programs/06-raffle/)                  | `raffle`                  | stub        |
 
-Each task has a `TASK.md` next to its source. `01-token` is fully implemented as
-the reference; `02`–`06` ship as buildable stubs for you to flesh out.
+Each task has a `TASK.md` next to its source. `01-donor-vault` is fully
+implemented as the reference; `02`–`06` ship as buildable stubs for you to flesh
+out.
 
 ## Getting started
 
 ```bash
 npm install
 anchor build          # compiles every program, generates target/idl + types
-npm run test:token    # build + run the 01-token bankrun suite
+npm run test:donorVault  # build + run the 01-donor-vault bankrun suite
 ```
 
 Run everything:
@@ -72,19 +73,19 @@ Run everything:
 npm test              # build + run all tests/*.test.ts
 ```
 
-Per-task test scripts: `test:token`, `test:priceVoting`,
+Per-task test scripts: `test:donorVault`, `test:priceVoting`,
 `test:priceVotingWithdrawal`, `test:ammPair`, `test:merkleAirdrop`,
 `test:raffle`.
 
 ## Testing with bankrun
 
 Tests use `solana-bankrun` + `anchor-bankrun`: a fast in-process Solana bank, no
-validator and no airdrops. The pattern (see `tests/01-token.test.ts`):
+validator and no airdrops. The pattern (see `tests/01-donor-vault.test.ts`):
 
 ```ts
 const context = await startAnchor("", [], []); // loads programs from Anchor.toml
 const provider = new BankrunProvider(context);
-const program = new Program<Token>(idl, provider);
+const program = new Program<DonorVault>(idl, provider);
 ```
 
 `startAnchor` reads `Anchor.toml` and loads each program's compiled `.so` from

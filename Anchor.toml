@@ -6,12 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-token = "GhAdtT9Vd5Gst89DyG8jShfgygJUdNcoQGGS5fGyZUVT"
-price_voting = "BG1zKVBhFmEi3CTGFf2NhEd9QwTH6N7g6Qtv9Ldidncf"
-price_voting_withdrawal = "5oVN5zywZG6XTUSrgD3qLkpUynYzPNh1MJyqGYK6drm9"
-amm_pair = "A1g16Bjuq9zNiekkSp3JF9X6q9JdJDzhqwz1HQ8tF3kP"
-merkle_airdrop = "B2RUWYg2zsmtu63qNxznF9DZkQ8Gbfymq22jXSpc4Lpf"
-raffle = "Ha5343T7Ld9Toc6vT9msr7Bu5D9DRFRP5JN8Hy7qm7sn"
+donor_vault = "GhAdtT9Vd5Gst89DyG8jShfgygJUdNcoQGGS5fGyZUVT"
 
 [registry]
 url = "https://api.apr.dev"

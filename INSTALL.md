@@ -221,6 +221,6 @@ validator**.
 
 ## References
 
-- Solana installation guide: <https://solana.com/docs/intro/installation>
 - Agave (Solana CLI) install: <https://docs.anza.xyz/cli/install>
+- Solana installation guide: <https://solana.com/docs/intro/installation>
 - Anchor installation: <https://www.anchor-lang.com/docs/installation>

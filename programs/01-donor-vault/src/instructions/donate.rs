@@ -80,13 +80,11 @@ pub fn donate(ctx: Context<Donate>, amount: u64, message: String) -> Result<()> 
         .checked_add(1)
         .ok_or(DonorVaultError::Overflow)?;
 
-    if first_donation {
-        let vault = &mut ctx.accounts.vault;
-        vault.unique_donor_count = vault
-            .unique_donor_count
-            .checked_add(1)
-            .ok_or(DonorVaultError::Overflow)?;
-    }
+    let vault = &mut ctx.accounts.vault;
+    vault.unique_donor_count = vault
+        .unique_donor_count
+        .checked_add(1)
+        .ok_or(DonorVaultError::Overflow)?;
 
     Ok(())
 }

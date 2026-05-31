@@ -28,7 +28,7 @@ impl Tier {
             Tier::Bronze
         } else if total < ONE_SOL {
             Tier::Silver
-        } else if total < TEN_SOL {
+        } else if total <= TEN_SOL {
             Tier::Gold
         } else {
             Tier::Platinum

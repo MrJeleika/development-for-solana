@@ -72,6 +72,13 @@ export const processTransaction = async (
   await ctx.banksClient.processTransaction(transaction);
 };
 
+/** Build a transaction from `instructions`, sign, and run it through the bank. */
+export const sendIxs = (
+  ctx: ProgramTestContext,
+  signers: Keypair[],
+  ...instructions: TransactionInstruction[]
+) => processTransaction(ctx, new Transaction().add(...instructions), signers);
+
 /**
  * The BanksClient equivalent of Anchor's `.view()`: simulate a *signed*
  * transaction (bankrun verifies signatures, so `.view()`'s unsigned tx fails)

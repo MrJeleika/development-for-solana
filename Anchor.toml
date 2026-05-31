@@ -7,6 +7,7 @@ skip-lint = false
 
 [programs.localnet]
 donor_vault = "GhAdtT9Vd5Gst89DyG8jShfgygJUdNcoQGGS5fGyZUVT"
+staking = "5EFjLnTAYMKtgb6pwfQL4YTnZbnjz9nPtwVTdLi4wn2d"
 
 [registry]
 url = "https://api.apr.dev"

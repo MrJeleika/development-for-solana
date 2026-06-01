@@ -143,4 +143,40 @@ describe("04-merkle-airdrop", () => {
       sendIxs(context, [claimant], ix),
     );
   });
+
+  it("rejects a signature meant for another user", async () => {
+    const { context, program, mint, vault, signer, claimants } = env;
+
+    const authorized = claimants[2]; // the signer authorizes this account...
+    const attacker = claimants[3]; // ...but a different account tries to use it
+    const amount = oneToken();
+    const attackerAta = getAssociatedTokenAddressSync(mint, attacker.publicKey);
+
+    const sigIx = buildClaimSignatureIx(
+      signer,
+      authorized.publicKey,
+      amount,
+      program.programId,
+    );
+    const claimIx = await program.methods
+      .claimWithSignature(amount)
+      .accountsPartial({
+        claim: claimPda(attacker.publicKey),
+        claimant: attacker.publicKey,
+        claimantAta: attackerAta,
+        mint,
+        vault,
+        instructionsSysvar: SYSVAR_INSTRUCTIONS_PUBKEY,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .instruction();
+
+    let threw = false;
+    try {
+      await sendIxs(context, [attacker], sigIx, claimIx);
+    } catch {
+      threw = true;
+    }
+    assert.isTrue(threw, "a signature for one user must not be usable by another");
+  });
 });

@@ -1,12 +1,11 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{transfer, Token, TokenAccount, Transfer};
 
-use crate::constants::{ENTRY_SEED, RAFFLE_SEED, VAULT_SEED};
+use crate::constants::{RAFFLE_SEED, VAULT_SEED};
 use crate::error::RaffleError;
-use crate::state::{Entry, Raffle, Randomness};
+use crate::state::{Raffle, Randomness};
 
 #[derive(Accounts)]
-#[instruction(entry_index: u64)]
 pub struct ClaimPrize<'info> {
     #[account(mut, seeds = [RAFFLE_SEED], bump)]
     pub raffle: Account<'info, Raffle>,
@@ -17,9 +16,6 @@ pub struct ClaimPrize<'info> {
     #[account(seeds = [b"randomness"], bump)]
     pub randomness: Account<'info, Randomness>,
 
-    #[account(seeds = [ENTRY_SEED, &entry_index.to_le_bytes()], bump)]
-    pub entry: Account<'info, Entry>,
-
     #[account(mut, token::mint = raffle.mint, token::authority = winner)]
     pub winner_ata: Account<'info, TokenAccount>,
 
@@ -28,26 +24,27 @@ pub struct ClaimPrize<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn claim(ctx: Context<ClaimPrize>, _entry_index: u64) -> Result<()> {
+pub fn claim(ctx: Context<ClaimPrize>) -> Result<()> {
     require!(ctx.accounts.randomness.fulfilled, RaffleError::NotDrawn);
     require!(!ctx.accounts.raffle.claimed, RaffleError::AlreadyClaimed);
-
-    // The caller hands us the entry it thinks won; verify it belongs to them and
-    // that the drawn ticket falls inside its range.
-    let entry = &ctx.accounts.entry;
-    require_keys_eq!(
-        entry.depositor,
-        ctx.accounts.winner.key(),
-        RaffleError::NotWinner
-    );
 
     let value = ctx.accounts.randomness.value;
     let r = u64::from_le_bytes(value[0..8].try_into().unwrap());
     let ticket = r % ctx.accounts.raffle.total_weight;
-    require!(
-        ticket >= entry.range_start && ticket < entry.range_end,
-        RaffleError::NotWinner
-    );
+
+    // Walk the entries, accumulating weight, until we reach the ticket's bucket.
+    let mut cumulative: u64 = 0;
+    let mut winner: Option<Pubkey> = None;
+    for entry in ctx.accounts.raffle.entries.iter() {
+        let next = cumulative + entry.weight;
+        if ticket >= cumulative && ticket < next {
+            winner = Some(entry.depositor);
+            break;
+        }
+        cumulative = next;
+    }
+    let winner = winner.ok_or(RaffleError::NotWinner)?;
+    require_keys_eq!(winner, ctx.accounts.winner.key(), RaffleError::NotWinner);
 
     let pot = ctx.accounts.vault.amount;
     let bump = ctx.bumps.raffle;

@@ -32,7 +32,7 @@ pub mod raffle {
         instructions::consume_randomness(ctx, randomness)
     }
 
-    pub fn claim(ctx: Context<ClaimPrize>, entry_index: u64) -> Result<()> {
-        instructions::claim(ctx, entry_index)
+    pub fn claim(ctx: Context<ClaimPrize>) -> Result<()> {
+        instructions::claim(ctx)
     }
 }

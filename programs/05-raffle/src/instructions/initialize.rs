@@ -50,8 +50,8 @@ pub fn initialize(ctx: Context<Initialize>, draw_time: i64, oracle: Pubkey) -> R
         mint: ctx.accounts.mint.key(),
         draw_time,
         total_weight: 0,
-        entry_count: 0,
         claimed: false,
+        entries: Vec::new(),
     });
     ctx.accounts.randomness.set_inner(Randomness {
         oracle,

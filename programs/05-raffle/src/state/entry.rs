@@ -1,11 +1,8 @@
 use anchor_lang::prelude::*;
 
-/// One deposit, owning the half-open ticket range `[range_start, range_end)`.
-/// The winner is the entry whose range contains the drawn ticket.
-#[account]
-#[derive(InitSpace)]
-pub struct Entry {
+/// One deposit, stored inline in the raffle's `entries` array.
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, InitSpace)]
+pub struct EntryData {
     pub depositor: Pubkey,
-    pub range_start: u64,
-    pub range_end: u64,
+    pub weight: u64,
 }

@@ -1,15 +1,12 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Idl, Program } from "@coral-xyz/anchor";
 import { BankrunProvider } from "anchor-bankrun";
-import {
-  AddedAccount,
-  Clock,
-  ProgramTestContext,
-  startAnchor,
-} from "solana-bankrun";
+import { resolve } from "path";
+import { AddedAccount, Clock, ProgramTestContext, start } from "solana-bankrun";
 import {
   Keypair,
   LAMPORTS_PER_SOL,
+  PublicKey,
   Signer,
   SystemProgram,
   Transaction,
@@ -19,8 +16,10 @@ import {
 /**
  * Boot an in-process bankrun bank, inject a pool of pre-funded accounts, wire
  * up a `BankrunProvider`, and build a typed `Program` from its IDL.
- * `startAnchor(".", [], [])` loads every program in `Anchor.toml` from
- * `target/deploy`, so build before running.
+ *
+ * Deploys ONLY this IDL's program (loaded by name from `target/deploy`), not the
+ * whole `Anchor.toml` workspace — so one task's suite never depends on the other
+ * (possibly unimplemented) programs compiling. Build this program before running.
  */
 export const initBankrun = async <IDL extends Idl>(idl: IDL) => {
   const accounts: Keypair[] = [];
@@ -42,7 +41,21 @@ export const initBankrun = async <IDL extends Idl>(idl: IDL) => {
     });
   }
 
-  const context = await startAnchor(".", [], accountsToInject);
+  // `start` finds `<name>.so` under SBF_OUT_DIR / BPF_OUT_DIR.
+  const deployDir = resolve("target/deploy");
+  process.env.SBF_OUT_DIR = process.env.SBF_OUT_DIR ?? deployDir;
+  process.env.BPF_OUT_DIR = process.env.BPF_OUT_DIR ?? deployDir;
+
+  const name = (idl as { metadata?: { name?: string } }).metadata?.name;
+  const address = (idl as { address?: string }).address;
+  if (!name || !address) {
+    throw new Error("IDL is missing metadata.name or address");
+  }
+
+  const context = await start(
+    [{ name, programId: new PublicKey(address) }],
+    accountsToInject,
+  );
   const provider = new BankrunProvider(context);
   anchor.setProvider(provider);
 

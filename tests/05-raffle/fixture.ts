@@ -92,19 +92,14 @@ export const setupRaffle = async (): Promise<RaffleFixture> => {
   return { context, program, payer, mint, raffle, vault, randomness, oracle, drawTime, entrants };
 };
 
-/** Build + send a deposit for `entrant`'s entry at `index`. */
-export const deposit = async (
-  env: RaffleFixture,
-  entrant: Entrant,
-  entryPda: PublicKey,
-) => {
+/** Build + send a deposit for `entrant`. */
+export const deposit = async (env: RaffleFixture, entrant: Entrant) => {
   const { context, program, mint, raffle, vault } = env;
   const ix = await program.methods
     .deposit(entrant.weight)
     .accountsPartial({
       raffle,
       vault,
-      entry: entryPda,
       depositorAta: entrant.ata,
       mint,
       depositor: entrant.keypair.publicKey,

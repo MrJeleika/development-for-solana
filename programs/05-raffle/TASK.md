@@ -1,47 +1,52 @@
 # 05 — Raffle (VRF)
 
-Players deposit a token to enter. The more you deposit, the better your odds.
+Players deposit a token to enter; the more you deposit, the better your odds.
 After a deadline, a **verifiably random** draw picks one weighted winner, who
-takes the whole pot. Randomness comes from **MagicBlock VRF**
-(`ephemeral-vrf-sdk`): you ask for it, and the oracle calls back later with the
-answer. (This is the Solana counterpart of the Solidity `06-raffle`.)
+takes the whole pot. The randomness comes from **MagicBlock VRF**: you request
+it, and the oracle calls your program back with the result. (This is the Solana
+counterpart of the Solidity `06-raffle`.)
 
-This module ships as a **starter** — the design is yours to figure out.
+This is a late milestone, so it ships as a **starter with almost nothing
+designed for you** — the accounts, the storage, and the winner logic are yours.
 
 ## What you're given
 
-- `src/lib.rs` — the program's five instructions.
-- `src/constants.rs` — the seeds.
-- `tests/05-raffle/fixture.ts` + `raffle.test.ts` — one happy-path test: two
-  weighted deposits, the deadline passes, a mocked draw, and the winner is paid.
-  It leans on the stubs you fill in.
+The VRF wiring only — it's plumbing, not the puzzle:
+
+- `request_randomness` — the CPI that asks MagicBlock VRF for a value (the
+  `#[vrf]` macro, `create_request_randomness_ix`, `invoke_signed_vrf`).
+- `consume_randomness` — the oracle's callback, including the check that the
+  caller really is the trusted oracle.
+- `state::Randomness` — a small account holding the trusted `oracle` and the
+  delivered `value`. The callback writes into it.
+- `Cargo.toml` with the VRF SDK already wired (the `anchor-compat` feature).
+- `tests/05-raffle/fixture.ts` — bankrun setup, a funded mint, and
+  `fulfillRandomness(env, value)`, which mocks the oracle's callback so your
+  tests can drive a draw without a live oracle.
 
 ## What you implement
 
-- The program: account layouts, errors, and the logic for all five instructions.
-- The per-entry PDA derivation left as `TODO` in the test.
-- The rest of the tests (the losing entry can't claim, claiming twice, claiming
-  before the draw, depositing after the deadline, someone else's entry, etc.).
+Everything else — and that's the point:
+
+- All state (besides `Randomness`), the errors, the seeds.
+- `initialize` — set up the raffle and **create the `Randomness` account,
+  storing the trusted oracle** (`env.oracle` in the tests).
+- `deposit` — take the tokens into a vault and record the entry.
+- The guard in `request_randomness` (deadline passed, entries exist, only once).
+- `claim` — pay the winner.
+- The tests (the happy path is stubbed; add the failure modes).
 
 ## Flow
 
-1. **Initialize** — open the raffle: record the deposit token, the deadline,
-   and who the trusted oracle is.
-2. **Deposit** — enter with some tokens while the raffle is open. Each deposit
-   is its own entry; its weight is its size.
-3. **Request randomness** — after the deadline, ask the oracle to draw. Once.
-4. **Consume randomness** — the oracle's callback delivers the random value.
-   This is where the winner is decided.
-5. **Claim** — the winner presents the winning entry and takes the pot. Once.
+1. **Initialize** — open the raffle; record the deadline and the trusted oracle.
+2. **Deposit** — enter while the raffle is open; your weight is your deposit.
+3. **Request randomness** — after the deadline, trigger the draw. Once.
+4. **Consume randomness** — the oracle's callback delivers the value.
+5. **Claim** — the winner proves they won and takes the pot. Once.
 
-## Constraints
+## The puzzle
 
-The draw must be fair: a deposit's chance of winning is proportional to its
-size, and nobody — not a player, not a validator, not whoever triggers the
-draw — can bias or predict the result. Work out the data structure that lets the
-winner prove they won without the program iterating over every entry.
-
-A random value is only trustworthy if it genuinely came from the oracle. The
-program must verify that itself — anyone can *call* the callback. In production
-the oracle is MagicBlock's VRF identity; the tests stand in a key they control
-to mock the response, but the verification you write is the real thing.
+A deposit's chance of winning must be proportional to its size, and nobody — not
+a player, not a validator, not whoever triggers the draw — can bias or predict
+the result. Work out a data structure where the winner can **prove** they won
+from a single random value, without the program looping over every entry.

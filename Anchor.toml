@@ -7,9 +7,13 @@ skip-lint = false
 
 [programs.localnet]
 donor_vault = "GhAdtT9Vd5Gst89DyG8jShfgygJUdNcoQGGS5fGyZUVT"
-staking = "5EFjLnTAYMKtgb6pwfQL4YTnZbnjz9nPtwVTdLi4wn2d"
-merkle_airdrop = "BbyrsYvVu6eTh7CGBaFfbJgS6Q7C8zQy1NfxA3Ne9xbt"
-raffle = "3JPbgoXU4LVsC4Lp2WzxQ7HufHTcFoNShfhiLLABKEFQ"
+# staking / merkle_airdrop / raffle are unimplemented starters that don't compile
+# yet, so they have no .so in target/deploy. bankrun's startAnchor loads every
+# program listed here, so leaving them listed makes it panic on startup. Re-add
+# each line once its program compiles.
+# staking = "5EFjLnTAYMKtgb6pwfQL4YTnZbnjz9nPtwVTdLi4wn2d"
+# merkle_airdrop = "BbyrsYvVu6eTh7CGBaFfbJgS6Q7C8zQy1NfxA3Ne9xbt"
+# raffle = "3JPbgoXU4LVsC4Lp2WzxQ7HufHTcFoNShfhiLLABKEFQ"
 
 [registry]
 url = "https://api.apr.dev"

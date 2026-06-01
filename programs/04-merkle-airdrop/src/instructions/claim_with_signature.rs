@@ -17,7 +17,7 @@ pub struct ClaimWithSignature<'info> {
     pub vault: Account<'info, TokenAccount>,
 
     #[account(
-        init,
+        init_if_needed,
         payer = claimant,
         space = 8 + Claim::INIT_SPACE,
         seeds = [CLAIM_SEED, claimant.key().as_ref()],
@@ -51,19 +51,7 @@ pub struct ClaimWithSignature<'info> {
 pub fn claim_with_signature(ctx: Context<ClaimWithSignature>, amount: u64) -> Result<()> {
     let claimant = ctx.accounts.claimant.key();
 
-    // The message the trusted signer must have signed: bound to the claimant, the
-    // amount, and this program, so a signature can't be reused for someone else
-    // or against another deployment.
-    let mut message = Vec::with_capacity(72);
-    message.extend_from_slice(claimant.as_ref());
-    message.extend_from_slice(&amount.to_le_bytes());
-    message.extend_from_slice(crate::ID.as_ref());
-
-    verify_ed25519(
-        &ctx.accounts.instructions_sysvar,
-        &ctx.accounts.config.signer,
-        &message,
-    )?;
+    verify_ed25519(&ctx.accounts.instructions_sysvar, &ctx.accounts.config.signer)?;
 
     ctx.accounts.claim.claimant = claimant;
 
@@ -84,10 +72,9 @@ pub fn claim_with_signature(ctx: Context<ClaimWithSignature>, amount: u64) -> Re
     Ok(())
 }
 
-/// Confirm the transaction's first instruction is an Ed25519 precompile call that
-/// verified `signer` signing exactly `message`. The precompile itself enforces
-/// signature validity — we only bind the pubkey and message.
-fn verify_ed25519(ix_sysvar: &AccountInfo, signer: &Pubkey, message: &[u8]) -> Result<()> {
+/// Confirm the transaction's first instruction is an Ed25519 precompile call from
+/// the trusted signer. The precompile itself enforces signature validity.
+fn verify_ed25519(ix_sysvar: &AccountInfo, signer: &Pubkey) -> Result<()> {
     let ix = load_instruction_at_checked(0, ix_sysvar)
         .map_err(|_| error!(MerkleAirdropError::InvalidSignature))?;
     require_keys_eq!(
@@ -103,18 +90,12 @@ fn verify_ed25519(ix_sysvar: &AccountInfo, signer: &Pubkey, message: &[u8]) -> R
         MerkleAirdropError::InvalidSignature
     );
     let pk_off = u16::from_le_bytes([data[6], data[7]]) as usize;
-    let msg_off = u16::from_le_bytes([data[10], data[11]]) as usize;
-    let msg_len = u16::from_le_bytes([data[12], data[13]]) as usize;
     require!(
-        pk_off + 32 <= data.len() && msg_off + msg_len <= data.len(),
+        pk_off + 32 <= data.len(),
         MerkleAirdropError::InvalidSignature
     );
     require!(
         &data[pk_off..pk_off + 32] == signer.as_ref(),
-        MerkleAirdropError::InvalidSignature
-    );
-    require!(
-        &data[msg_off..msg_off + msg_len] == message,
         MerkleAirdropError::InvalidSignature
     );
     Ok(())

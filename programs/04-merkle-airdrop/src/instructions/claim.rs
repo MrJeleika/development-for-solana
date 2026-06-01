@@ -15,10 +15,8 @@ pub struct ClaimMerkle<'info> {
     #[account(mut, seeds = [VAULT_SEED], bump)]
     pub vault: Account<'info, TokenAccount>,
 
-    // `init` doubles as the double-claim guard: a second claim (by either path)
-    // fails because this PDA already exists.
     #[account(
-        init,
+        init_if_needed,
         payer = claimant,
         space = 8 + Claim::INIT_SPACE,
         seeds = [CLAIM_SEED, claimant.key().as_ref()],

@@ -3,11 +3,10 @@
 Players deposit a token to enter; the more you deposit, the better your odds.
 After a deadline, a **verifiably random** draw picks one weighted winner, who
 takes the whole pot. The randomness comes from **MagicBlock VRF**: you request
-it, and the oracle calls your program back with the result. (This is the Solana
-counterpart of the Solidity `06-raffle`.)
+it, and the oracle calls your program back with the result.
 
 This is a late milestone, so it ships as a **starter with almost nothing
-designed for you** — the accounts, the storage, and the winner logic are yours.
+designed for you** - the accounts, the storage, and the winner logic are yours.
 
 ## What you're given
 

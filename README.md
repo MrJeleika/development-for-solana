@@ -89,7 +89,7 @@ const program = new Program<DonorVault>(idl, provider);
 ```
 
 `startAnchor` reads `Anchor.toml` and loads each program's compiled `.so` from
-`target/deploy`, so **build before testing** (the npm scripts do this for you).
+`target/deploy`, so **build before testing** (the npm scripts do this for you)
 The SPL Token and Associated Token programs are available in the bank out of the
 box.
 

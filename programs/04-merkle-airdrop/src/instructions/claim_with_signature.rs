@@ -51,11 +51,9 @@ pub struct ClaimWithSignature<'info> {
 pub fn claim_with_signature(ctx: Context<ClaimWithSignature>, amount: u64) -> Result<()> {
     let claimant = ctx.accounts.claimant.key();
 
-    // The message the trusted signer must have signed: bound to the claimant, the
-    // amount, and this program, so a signature can't be reused for someone else
-    // or against another deployment.
-    let mut message = Vec::with_capacity(72);
-    message.extend_from_slice(claimant.as_ref());
+    // The message the trusted signer must have signed: bound to the amount and
+    // this program, so a signature can't be reused against another deployment.
+    let mut message = Vec::with_capacity(40);
     message.extend_from_slice(&amount.to_le_bytes());
     message.extend_from_slice(crate::ID.as_ref());
 

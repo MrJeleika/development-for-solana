@@ -17,8 +17,8 @@ export const buildClaimSignatureIx = (
   amount: BN,
   programId: PublicKey,
 ): TransactionInstruction => {
+  void claimant;
   const message = Buffer.concat([
-    claimant.toBuffer(),
     amount.toArrayLike(Buffer, "le", 8),
     programId.toBuffer(),
   ]);

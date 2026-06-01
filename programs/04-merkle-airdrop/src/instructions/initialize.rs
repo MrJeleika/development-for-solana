@@ -7,7 +7,7 @@ use crate::state::Config;
 #[derive(Accounts)]
 pub struct Initialize<'info> {
     #[account(
-        init_if_needed,
+        init,
         payer = payer,
         space = 8 + Config::INIT_SPACE,
         seeds = [CONFIG_SEED],
@@ -18,7 +18,7 @@ pub struct Initialize<'info> {
     // The airdrop pool: a PDA token account owned by the config, so only the
     // program can pay out claims.
     #[account(
-        init_if_needed,
+        init,
         payer = payer,
         seeds = [VAULT_SEED],
         bump,

@@ -2,5 +2,8 @@ use anchor_lang::prelude::*;
 
 #[error_code]
 pub enum MerkleAirdropError {
-    // TODO: add the errors this program needs.
+    #[msg("invalid Merkle proof")]
+    InvalidProof,
+    #[msg("invalid or missing Ed25519 signature")]
+    InvalidSignature,
 }
